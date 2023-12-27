@@ -1,13 +1,13 @@
-package taskflow.services.impl;
+package taskflow.service.impl;
 
 import taskflow.entities.User;
 import taskflow.entities.enums.Role;
-import taskflow.dto.requests.AuthenticationRequest;
-import taskflow.dto.requests.RegisterRequest;
-import taskflow.dto.responses.AuthenticationResponse;
-import taskflow.repositories.UserRepository;
+import taskflow.dto.request.AuthenticationRequest;
+import taskflow.dto.request.RegisterRequest;
+import taskflow.dto.response.AuthenticationResponse;
+import taskflow.repository.UserRepository;
 import taskflow.security.JwtService;
-import taskflow.services.AuthenticationService;
+import taskflow.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

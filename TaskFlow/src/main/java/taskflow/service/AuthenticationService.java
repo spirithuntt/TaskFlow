@@ -1,9 +1,9 @@
-package taskflow.services;
+package taskflow.service;
 
 import org.springframework.stereotype.Component;
-import taskflow.dto.requests.AuthenticationRequest;
-import taskflow.dto.requests.RegisterRequest;
-import taskflow.dto.responses.AuthenticationResponse;
+import taskflow.dto.request.AuthenticationRequest;
+import taskflow.dto.request.RegisterRequest;
+import taskflow.dto.response.AuthenticationResponse;
 
 @Component
 public interface AuthenticationService {

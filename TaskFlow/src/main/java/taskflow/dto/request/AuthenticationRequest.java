@@ -1,4 +1,4 @@
-package taskflow.dto.requests;
+package taskflow.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

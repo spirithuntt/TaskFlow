@@ -6,10 +6,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import taskflow.dto.requests.AuthenticationRequest;
-import taskflow.dto.requests.RegisterRequest;
-import taskflow.dto.responses.AuthenticationResponse;
-import taskflow.services.AuthenticationService;
+import taskflow.dto.request.AuthenticationRequest;
+import taskflow.dto.request.RegisterRequest;
+import taskflow.dto.response.AuthenticationResponse;
+import taskflow.service.AuthenticationService;
 
 @RestController
 @RequestMapping("/api/v1/auth")
