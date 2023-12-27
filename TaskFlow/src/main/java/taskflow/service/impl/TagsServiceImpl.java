@@ -1,6 +1,4 @@
 package taskflow.service.impl;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import taskflow.dto.request.TagsRequestDTO;
 import taskflow.dto.response.TagsResponseDTO;
@@ -18,7 +16,6 @@ public class TagsServiceImpl implements TagsService {
     private final TagsRepository tagsRepository;
     private final TagsMapper tagsMapper;
 
-    @Autowired
     public TagsServiceImpl(TagsRepository tagsRepository, TagsMapper tagsMapper) {
         this.tagsRepository = tagsRepository;
         this.tagsMapper = tagsMapper;
