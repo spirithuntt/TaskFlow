@@ -35,10 +35,10 @@ public class TagsServiceImpl implements TagsService {
                 return new TagsResponseDTO(tags.getId(), tags.getName(), "success", "Tag added successfully");
 //                throw new RuntimeException("Error creating tags: " + tagsRequestDTO.getName()+ "This is a test exception");
             } else {
-                return new TagsResponseDTO(null, null, "error", "Failed to add tag");
+                return new TagsResponseDTO("error", "Failed to add tag");
             }
         } catch (Exception e) {
-            return new TagsResponseDTO(null, null, "error", "Error creating tags: " + e.getMessage());
+            return new TagsResponseDTO("error", "Error creating tags: " + e.getMessage());
         }
     }
 
@@ -48,9 +48,9 @@ public class TagsServiceImpl implements TagsService {
             Tags tags = tagsRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Tags not found with id: " + id));
             return new TagsResponseDTO(tags.getId(), tags.getName(), "success", "Tag retrieved successfully");
         } catch (EntityNotFoundException e) {
-            return new TagsResponseDTO(null, null, "error", "Tags not found with id: " + id);
+            return new TagsResponseDTO("error", "Tags not found with id: " + id);
         } catch (Exception e) {
-            return new TagsResponseDTO(null, null, "error", "Error getting tags: " + e.getMessage());
+            return new TagsResponseDTO("error", "Error getting tags: " + e.getMessage());
         }
     }
 
@@ -62,7 +62,7 @@ public class TagsServiceImpl implements TagsService {
                     .map(tags -> new TagsResponseDTO(tags.getId(), tags.getName(), "success", "Tags retrieved successfully"))
                     .collect(Collectors.toList());
         } catch (Exception e) {
-            return Collections.singletonList(new TagsResponseDTO(null, null, "error", "Error getting tags: " + e.getMessage()));
+            return Collections.singletonList(new TagsResponseDTO("error", "Error getting tags: " + e.getMessage()));
         }
     }
 
@@ -74,9 +74,9 @@ public class TagsServiceImpl implements TagsService {
             existingTags = tagsRepository.save(existingTags);
             return new TagsResponseDTO(existingTags.getId(), existingTags.getName(), "success", "Tag updated successfully");
         } catch (EntityNotFoundException e) {
-            return new TagsResponseDTO(null, null, "error", "Tags not found with id: " + id);
+            return new TagsResponseDTO("error", "Tags not found with id: " + id);
         } catch (Exception e) {
-            return new TagsResponseDTO(null, null, "error", "Error updating tags: " + e.getMessage());
+            return new TagsResponseDTO("error", "Error updating tags: " + e.getMessage());
         }
     }
 
@@ -85,11 +85,11 @@ public class TagsServiceImpl implements TagsService {
         try {
             Tags tags = tagsRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Tags not found with id: " + id));
             tagsRepository.delete(tags);
-            new TagsResponseDTO(null, null, "success", "Tag deleted successfully");
+            new TagsResponseDTO("success", "Tag deleted successfully");
         } catch (EntityNotFoundException e) {
-            new TagsResponseDTO(null, null, "error", "Tags not found with id: " + id);
+            new TagsResponseDTO( "error", "Tags not found with id: " + id);
         } catch (Exception e) {
-            new TagsResponseDTO(null, null, "error", "Error deleting tags: " + e.getMessage());
+            new TagsResponseDTO("error", "Error deleting tags: " + e.getMessage());
         }
     }
 }

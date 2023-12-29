@@ -12,4 +12,9 @@ public class TagsResponseDTO {
     private String name;
     private String status; //("success" or "error")
     private String message;
+
+    public TagsResponseDTO(String status, String message) {
+        this.status = status;
+        this.message = message;
+    }
 }
