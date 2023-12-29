@@ -10,7 +10,9 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Tags {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

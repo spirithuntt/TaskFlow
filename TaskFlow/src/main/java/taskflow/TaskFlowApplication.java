@@ -1,10 +1,10 @@
 package taskflow;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import taskflow.mapper.TagsMapper;
 
 @SpringBootApplication
 //@ComponentScan(basePackages = "taskflow.mapper")
@@ -14,9 +14,9 @@ public class TaskFlowApplication {
         SpringApplication.run(TaskFlowApplication.class, args);
     }
 
-//    @Bean
-//    public TagsMapper tagsMapper() {
-//        return TagsMapper.INSTANCE;
-//    }
+    @Bean
+    public ModelMapper modelMapper(){
+        return new ModelMapper();
+    }
 
 }
