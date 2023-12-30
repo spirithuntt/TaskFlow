@@ -58,10 +58,12 @@ public class TaskServiceImpl implements TaskService {
                 throw new IllegalArgumentException("Start date must be at least 3 days from now");
             }
 
-            // Validate the deadline (ensure it is at least 3 days from the start date)
+            // Validate the deadline (ensure it is at least 3 days from the start date and not more than 14 days)
             LocalDate deadline = task.getDeadline();
-            if (deadline != null && startDate != null && deadline.isBefore(startDate.plusDays(3))) {
-                throw new IllegalArgumentException("Deadline must be at least 3 days from the start date");
+            if (deadline != null && startDate != null) {
+                if (deadline.isBefore(startDate.plusDays(3)) || deadline.isAfter(startDate.plusDays(14))) {
+                    throw new IllegalArgumentException("Deadline must be between 3 and 14 days from the start date");
+                }
             }
 
             // Associate tags with the task
