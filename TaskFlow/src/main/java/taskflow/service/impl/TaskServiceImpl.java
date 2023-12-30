@@ -13,6 +13,7 @@ import taskflow.repository.TagsRepository;
 import taskflow.repository.TaskRepository;
 import taskflow.service.TaskService;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,6 +35,10 @@ public class TaskServiceImpl implements TaskService {
     public TaskResponseDTO createTask(TaskRequestDTO taskRequestDTO) {
         try {
             Task task = modelMapper.map(taskRequestDTO, Task.class);
+            // Set the creation date to the current date
+            task.setCreationDate(LocalDate.now());
+            // Set the task status to NOT_STARTED
+            task.setStatus(TaskStatus.NOT_STARTED);
 
             // Associate tags with the task
             List<Long> tagIds = taskRequestDTO.getTagIds();
@@ -43,7 +48,13 @@ public class TaskServiceImpl implements TaskService {
             }
 
             task = taskRepository.save(task);
-            return modelMapper.map(task, TaskResponseDTO.class);
+
+            // Returning success message along with task details
+            TaskResponseDTO responseDTO = modelMapper.map(task, TaskResponseDTO.class);
+            responseDTO.setStatus("success");
+            responseDTO.setMessage("Task created successfully");
+            return responseDTO;
+
         } catch (Exception e) {
             return new TaskResponseDTO("error", "Error creating task: " + e.getMessage());
         }
