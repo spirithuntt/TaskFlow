@@ -52,6 +52,18 @@ public class TaskServiceImpl implements TaskService {
                 task.setCreatedBy(createdBy);
             }
 
+            // Validate the start date (ensure it is at least 3 days from now)
+            LocalDate startDate = task.getStartDate();
+            if (startDate != null && startDate.isBefore(LocalDate.now().plusDays(3))) {
+                throw new IllegalArgumentException("Start date must be at least 3 days from now");
+            }
+
+            // Validate the deadline (ensure it is at least 3 days from the start date)
+            LocalDate deadline = task.getDeadline();
+            if (deadline != null && startDate != null && deadline.isBefore(startDate.plusDays(3))) {
+                throw new IllegalArgumentException("Deadline must be at least 3 days from the start date");
+            }
+
             // Associate tags with the task
             List<Long> tagIds = taskRequestDTO.getTagIds();
             if (tagIds != null && !tagIds.isEmpty()) {
