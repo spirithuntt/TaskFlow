@@ -2,16 +2,18 @@ package taskflow.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import taskflow.dto.request.TaskRequestDTO;
 import taskflow.dto.response.TaskResponseDTO;
+import taskflow.entities.Tags;
 import taskflow.entities.Task;
 import taskflow.entities.User;
 import taskflow.entities.enums.TaskStatus;
+import taskflow.repository.TagsRepository;
 import taskflow.repository.TaskRepository;
 import taskflow.service.TaskService;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,10 +21,12 @@ import java.util.stream.Collectors;
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
+    private final TagsRepository tagRepository;
     private final ModelMapper modelMapper;
 
-    public TaskServiceImpl(TaskRepository taskRepository, ModelMapper modelMapper) {
+    public TaskServiceImpl(TaskRepository taskRepository, TagsRepository tagRepository, ModelMapper modelMapper) {
         this.taskRepository = taskRepository;
+        this.tagRepository = tagRepository;
         this.modelMapper = modelMapper;
     }
 
@@ -30,6 +34,14 @@ public class TaskServiceImpl implements TaskService {
     public TaskResponseDTO createTask(TaskRequestDTO taskRequestDTO) {
         try {
             Task task = modelMapper.map(taskRequestDTO, Task.class);
+
+            // Associate tags with the task
+            List<Long> tagIds = taskRequestDTO.getTagIds();
+            if (tagIds != null && !tagIds.isEmpty()) {
+                List<Tags> tags = tagRepository.findAllById(tagIds);
+                task.setTags(new HashSet<>(tags));
+            }
+
             task = taskRepository.save(task);
             return modelMapper.map(task, TaskResponseDTO.class);
         } catch (Exception e) {

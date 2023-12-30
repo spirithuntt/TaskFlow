@@ -7,6 +7,7 @@ import taskflow.entities.enums.TaskStatus;
 
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -38,6 +39,14 @@ public class Task {
     @ManyToOne
     @JoinColumn(name = "assigned_to_id")
     private User assignedTo;
+
+    @ManyToMany
+    @JoinTable(
+            name = "tasks_to_tags",
+            joinColumns = @JoinColumn(name = "task_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<Tags> tags;
 
     @Override
     public final boolean equals(Object o) {
