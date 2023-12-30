@@ -11,6 +11,7 @@ import taskflow.entities.User;
 import taskflow.entities.enums.TaskStatus;
 import taskflow.repository.TagsRepository;
 import taskflow.repository.TaskRepository;
+import taskflow.repository.UserRepository;
 import taskflow.service.TaskService;
 
 import java.time.LocalDate;
@@ -23,11 +24,13 @@ public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
     private final TagsRepository tagRepository;
+    private final UserRepository userRepository;
     private final ModelMapper modelMapper;
 
-    public TaskServiceImpl(TaskRepository taskRepository, TagsRepository tagRepository, ModelMapper modelMapper) {
+    public TaskServiceImpl(TaskRepository taskRepository, TagsRepository tagRepository, UserRepository userRepository, ModelMapper modelMapper) {
         this.taskRepository = taskRepository;
         this.tagRepository = tagRepository;
+        this.userRepository = userRepository;
         this.modelMapper = modelMapper;
     }
 
@@ -37,8 +40,17 @@ public class TaskServiceImpl implements TaskService {
             Task task = modelMapper.map(taskRequestDTO, Task.class);
             // Set the creation date to the current date
             task.setCreationDate(LocalDate.now());
+
             // Set the task status to NOT_STARTED
             task.setStatus(TaskStatus.NOT_STARTED);
+
+            // Set the createdBy user
+            Long createdById = taskRequestDTO.getCreatedById();
+            if (createdById != null) {
+                User createdBy = userRepository.findById(createdById)
+                        .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + createdById));
+                task.setCreatedBy(createdBy);
+            }
 
             // Associate tags with the task
             List<Long> tagIds = taskRequestDTO.getTagIds();

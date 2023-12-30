@@ -12,4 +12,5 @@ public class TaskRequestDTO {
     private LocalDate startDate;
     private LocalDate deadline;
     private List<Long> tagIds;
+    private Long createdById;
 }
