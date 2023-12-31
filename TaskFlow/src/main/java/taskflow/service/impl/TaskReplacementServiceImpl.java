@@ -62,6 +62,19 @@ public class TaskReplacementServiceImpl implements TaskReplacementService {
                 throw new IllegalArgumentException("Invalid userId provided for Task with id: " + taskId);
             }
 
+            // Check if the user has already performed a DELETE action this month
+            boolean hasPerformedDeleteAction = taskReplacementRepository.existsByOldUserAndActionAndStatusAndDateTimeAfter(
+                    user,
+                    TaskAction.DELETE,
+                    TaskReplacementStatus.APPROVED,
+                    LocalDateTime.now().withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0)
+            );
+
+            if (hasPerformedDeleteAction) {
+                // If the user has already performed a DELETE action this month, set TaskReplacementStatus to CLOSED
+                return new TaskReplacementResponseDTO("error", "User can only perform one DELETE action per month");
+            }
+
             // Store the assigned user before setting assignedTo to NULL
             User assignedToUser = task.getAssignedTo();
 
