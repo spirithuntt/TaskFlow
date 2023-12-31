@@ -123,4 +123,48 @@ public class TaskReplacementServiceImpl implements TaskReplacementService {
         }
     }
 
+    @Override
+    public TaskReplacementResponseDTO createEditTaskReplacement(TaskReplacementRequestDTO requestDTO) {
+        try {
+            Long taskId = requestDTO.getTaskId();
+            Long userId = requestDTO.getUserId();
+
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+
+            Task task = taskRepository.findById(taskId)
+                    .orElseThrow(() -> new EntityNotFoundException("Task not found with id: " + taskId));
+
+            // Check if the provided userId matches the assignedToId of the task
+            Long assignedToId = task.getAssignedTo() != null ? task.getAssignedTo().getId() : null;
+            if (!Objects.equals(userId, assignedToId)) {
+                throw new IllegalArgumentException("Invalid userId provided for Task with id: " + taskId);
+            }
+
+            // Create TaskReplacement with EDIT action and OPEN status
+            TaskReplacement taskReplacement = new TaskReplacement();
+            taskReplacement.setTask(task);
+            taskReplacement.setDateTime(LocalDateTime.now());
+            taskReplacement.setOldUser(task.getAssignedTo()); // Set to assigned user for EDIT action
+            taskReplacement.setNewUser(null); // Set to NULL for EDIT action
+            taskReplacement.setAction(TaskAction.EDIT);
+            taskReplacement.setStatus(TaskReplacementStatus.OPEN);
+
+            taskReplacement = taskReplacementRepository.save(taskReplacement);
+
+            // Returning success message along with created task replacement details
+            TaskReplacementResponseDTO responseDTO = modelMapper.map(taskReplacement, TaskReplacementResponseDTO.class);
+            responseDTO.setStatus("success");
+            responseDTO.setMessage("TaskReplacement created successfully");
+            return responseDTO;
+        } catch (EntityNotFoundException e) {
+            return new TaskReplacementResponseDTO("error", "Task not found with id: " + requestDTO.getTaskId());
+        } catch (IllegalArgumentException e) {
+            return new TaskReplacementResponseDTO("error", e.getMessage());
+        } catch (Exception e) {
+            return new TaskReplacementResponseDTO("error", "Error creating task replacement: " + e.getMessage());
+        }
+    }
+
+
 }

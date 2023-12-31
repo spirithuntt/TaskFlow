@@ -34,4 +34,15 @@ public class TaskReplacementController {
         }
     }
 
+    @PostMapping("/edit-replacement")
+    public ResponseEntity<TaskReplacementResponseDTO> createEditTaskReplacement(@RequestBody TaskReplacementRequestDTO requestDTO) {
+        TaskReplacementResponseDTO responseDTO = taskReplacementService.createEditTaskReplacement(requestDTO);
+        if ("error".equals(responseDTO.getStatus())) {
+            return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
+        } else {
+            return ResponseEntity.ok(responseDTO);
+        }
+    }
+
+
 }
