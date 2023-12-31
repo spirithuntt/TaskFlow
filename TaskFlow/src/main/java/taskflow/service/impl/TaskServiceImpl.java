@@ -102,7 +102,8 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskResponseDTO assignTaskToUser(Long id, TaskUpdateRequestDTO taskUpdateRequestDTO) {
         try {
-            Task existingTask = taskRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Task not found with id: " + id));
+            Task existingTask = taskRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Task not found with id: " + id));
 
             // Check if the provided createdById is the same as the one in the existing task
             Long providedCreatedById = taskUpdateRequestDTO.getCreatedById();
@@ -117,22 +118,30 @@ public class TaskServiceImpl implements TaskService {
                 throw new IllegalArgumentException("Task must be assigned at least 3 days before the start date");
             }
 
-            // Assign the task to the specified user
-            Long assignedToId = taskUpdateRequestDTO.getAssignedToId();
-            if (assignedToId != null) {
-                User assignedTo = userRepository.findById(assignedToId)
-                        .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + assignedToId));
-                existingTask.setAssignedTo(assignedTo);
+            // Check if the task is in the NOT_STARTED status
+            if (existingTask.getStatus() == TaskStatus.NOT_STARTED) {
+                // Assign the task to the specified user
+                Long assignedToId = taskUpdateRequestDTO.getAssignedToId();
+                if (assignedToId != null) {
+                    User assignedTo = userRepository.findById(assignedToId)
+                            .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + assignedToId));
+                    existingTask.setAssignedTo(assignedTo);
 
-                existingTask = taskRepository.save(existingTask);
+                    // Set the task status to IN_PROGRESS
+                    existingTask.setStatus(TaskStatus.IN_PROGRESS);
 
-                // Returning success message along with task details
-                TaskResponseDTO responseDTO = modelMapper.map(existingTask, TaskResponseDTO.class);
-                responseDTO.setStatus("success");
-                responseDTO.setMessage("Task assigned successfully");
-                return responseDTO;
+                    existingTask = taskRepository.save(existingTask);
+
+                    // Returning success message along with task details
+                    TaskResponseDTO responseDTO = modelMapper.map(existingTask, TaskResponseDTO.class);
+                    responseDTO.setStatus("success");
+                    responseDTO.setMessage("Task assigned successfully");
+                    return responseDTO;
+                } else {
+                    throw new IllegalArgumentException("AssignedToId cannot be null");
+                }
             } else {
-                throw new IllegalArgumentException("AssignedToId cannot be null");
+                throw new IllegalArgumentException("Task is not in the NOT_STARTED status");
             }
         } catch (EntityNotFoundException e) {
             return new TaskResponseDTO("error", "Task not found with id: " + id);
@@ -155,22 +164,30 @@ public class TaskServiceImpl implements TaskService {
                 throw new IllegalArgumentException("Task is already assigned to another user");
             }
 
-            // Assign the task to the specified user
-            Long userId = assignmentDTO.getUserId();
-            if (userId != null) {
-                User assignedTo = userRepository.findById(userId)
-                        .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
-                existingTask.setAssignedTo(assignedTo);
+            // Check if the task is in the NOT_STARTED status
+            if (existingTask.getStatus() == TaskStatus.NOT_STARTED) {
+                // Assign the task to the specified user
+                Long userId = assignmentDTO.getUserId();
+                if (userId != null) {
+                    User assignedTo = userRepository.findById(userId)
+                            .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+                    existingTask.setAssignedTo(assignedTo);
 
-                existingTask = taskRepository.save(existingTask);
+                    // Set the task status to IN_PROGRESS
+                    existingTask.setStatus(TaskStatus.IN_PROGRESS);
 
-                // Returning success message along with task details
-                TaskResponseDTO responseDTO = modelMapper.map(existingTask, TaskResponseDTO.class);
-                responseDTO.setStatus("success");
-                responseDTO.setMessage("Task assigned successfully");
-                return responseDTO;
+                    existingTask = taskRepository.save(existingTask);
+
+                    // Returning success message along with task details
+                    TaskResponseDTO responseDTO = modelMapper.map(existingTask, TaskResponseDTO.class);
+                    responseDTO.setStatus("success");
+                    responseDTO.setMessage("Task assigned successfully");
+                    return responseDTO;
+                } else {
+                    throw new IllegalArgumentException("UserId cannot be null");
+                }
             } else {
-                throw new IllegalArgumentException("UserId cannot be null");
+                throw new IllegalArgumentException("Task is not in the NOT_STARTED status");
             }
         } catch (EntityNotFoundException e) {
             return new TaskResponseDTO("error", e.getMessage());
@@ -180,6 +197,7 @@ public class TaskServiceImpl implements TaskService {
             return new TaskResponseDTO("error", "Error assigning task: " + e.getMessage());
         }
     }
+
 
     @Override
     public TaskResponseDTO updateTaskStatusToDone(TaskStatusUpdateRequestDTO requestDTO) {
