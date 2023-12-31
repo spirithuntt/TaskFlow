@@ -45,6 +45,14 @@ public class TaskReplacementServiceImpl implements TaskReplacementService {
             Long taskId = requestDTO.getTaskId();
             Long userId = requestDTO.getUserId();
 
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+
+            // Check if the user has enough tokens
+            if (user.getToken() <= 0) {
+                throw new IllegalArgumentException("User does not have enough tokens");
+            }
+
             Task task = taskRepository.findById(taskId)
                     .orElseThrow(() -> new EntityNotFoundException("Task not found with id: " + taskId));
 
@@ -60,6 +68,10 @@ public class TaskReplacementServiceImpl implements TaskReplacementService {
             // Set the assignedTo to NULL
             task.setAssignedTo(null);
             taskRepository.save(task);
+
+            // Decrement user's token count by 1
+            user.setToken(user.getToken() - 1);
+            userRepository.save(user);
 
             // Create TaskReplacement with DELETE action
             TaskReplacement taskReplacement = new TaskReplacement();
