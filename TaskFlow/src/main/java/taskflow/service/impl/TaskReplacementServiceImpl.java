@@ -71,8 +71,20 @@ public class TaskReplacementServiceImpl implements TaskReplacementService {
             );
 
             if (hasPerformedDeleteAction) {
-                // If the user has already performed a DELETE action this month, set TaskReplacementStatus to CLOSED
+                // If the user has already performed a DELETE action this month
                 return new TaskReplacementResponseDTO("error", "User can only perform one DELETE action per month");
+            }
+
+            // Check if the task has already been approved for DELETE by any user
+            boolean hasApprovedDeleteAction = taskReplacementRepository.existsByTaskAndActionAndStatus(
+                    task,
+                    TaskAction.DELETE,
+                    TaskReplacementStatus.APPROVED
+            );
+
+            if (hasApprovedDeleteAction) {
+                // If the task has already been approved for DELETE, return an error response
+                return new TaskReplacementResponseDTO("error", "Task has already been approved for deletion by another user");
             }
 
             // Store the assigned user before setting assignedTo to NULL
@@ -90,10 +102,7 @@ public class TaskReplacementServiceImpl implements TaskReplacementService {
             TaskReplacement taskReplacement = new TaskReplacement();
             taskReplacement.setTask(task);
             taskReplacement.setDateTime(LocalDateTime.now());
-
-            // Set OldUser as the user to whom the task was assigned before the change
-            taskReplacement.setOldUser(assignedToUser);
-
+            taskReplacement.setOldUser(assignedToUser); // Set OldUser as the user to whom the task was assigned before the change
             taskReplacement.setNewUser(null); // Set to NULL for DELETE action
             taskReplacement.setAction(TaskAction.DELETE);
             taskReplacement.setStatus(TaskReplacementStatus.APPROVED);
