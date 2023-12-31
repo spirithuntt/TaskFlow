@@ -141,6 +141,11 @@ public class TaskReplacementServiceImpl implements TaskReplacementService {
                 throw new IllegalArgumentException("Invalid userId provided for Task with id: " + taskId);
             }
 
+            // Check if the user has enough tokens
+            if (user.getToken() <= 0) {
+                throw new IllegalArgumentException("User does not have enough tokens");
+            }
+
             // Create TaskReplacement with EDIT action and OPEN status
             TaskReplacement taskReplacement = new TaskReplacement();
             taskReplacement.setTask(task);
