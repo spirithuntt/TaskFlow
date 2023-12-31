@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import taskflow.dto.request.TaskAssignmentRequestDTO;
 import taskflow.dto.request.TaskRequestDTO;
+import taskflow.dto.request.TaskStatusUpdateRequestDTO;
 import taskflow.dto.request.TaskUpdateRequestDTO;
 import taskflow.dto.response.TaskResponseDTO;
 import taskflow.service.TaskService;
@@ -50,6 +51,16 @@ public class TaskController {
         }
     }
 
+    @PutMapping("/status/done")
+    public ResponseEntity<TaskResponseDTO> updateTaskStatusToDone(@RequestBody TaskStatusUpdateRequestDTO requestDTO) {
+        TaskResponseDTO responseDTO = taskService.updateTaskStatusToDone(requestDTO);
+        if ("error".equals(responseDTO.getStatus())) {
+            return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
+        } else {
+            return ResponseEntity.ok(responseDTO);
+        }
+    }
+
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     @GetMapping("/{id}")
@@ -62,18 +73,6 @@ public class TaskController {
     public ResponseEntity<List<TaskResponseDTO>> getAllTasks() {
         List<TaskResponseDTO> taskList = taskService.getAllTasks();
         return ResponseEntity.ok(taskList);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<TaskResponseDTO> updateTask(@PathVariable Long id, @RequestBody TaskRequestDTO taskRequestDTO) {
-        TaskResponseDTO updatedTask = taskService.updateTask(id, taskRequestDTO);
-        return ResponseEntity.ok(updatedTask);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
-        taskService.deleteTask(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 

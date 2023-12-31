@@ -5,6 +5,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import taskflow.dto.request.TaskAssignmentRequestDTO;
 import taskflow.dto.request.TaskRequestDTO;
+import taskflow.dto.request.TaskStatusUpdateRequestDTO;
 import taskflow.dto.request.TaskUpdateRequestDTO;
 import taskflow.dto.response.TaskResponseDTO;
 import taskflow.entities.Tags;
@@ -180,6 +181,54 @@ public class TaskServiceImpl implements TaskService {
         }
     }
 
+    @Override
+    public TaskResponseDTO updateTaskStatusToDone(TaskStatusUpdateRequestDTO requestDTO) {
+        try {
+            Long taskId = requestDTO.getTaskId();
+            Long userId = requestDTO.getUserId();
+
+            Task task = taskRepository.findById(taskId)
+                    .orElseThrow(() -> new EntityNotFoundException("Task not found with id: " + taskId));
+
+            // Check if the provided userId matches the assignedToId of the task
+            Long assignedToId = task.getAssignedTo() != null ? task.getAssignedTo().getId() : null;
+            if (!Objects.equals(userId, assignedToId)) {
+                throw new IllegalArgumentException("Invalid userId provided for Task with id: " + taskId);
+            }
+
+            // Check if the task is before the deadline
+            LocalDate currentDate = LocalDate.now();
+            LocalDate deadline = task.getDeadline();
+
+            if (deadline != null && !currentDate.isAfter(deadline)) {
+                // Check if the current status is IN_PROGRESS
+                if (task.getStatus() == TaskStatus.IN_PROGRESS) {
+                    // Update the task status to DONE
+                    task.setStatus(TaskStatus.DONE);
+                    task = taskRepository.save(task);
+
+                    // Returning success message along with updated task details
+                    TaskResponseDTO responseDTO = modelMapper.map(task, TaskResponseDTO.class);
+                    responseDTO.setStatus("success");
+                    responseDTO.setMessage("Task status updated to DONE");
+                    return responseDTO;
+                } else {
+                    // Return an error message if the current status is not IN_PROGRESS
+                    throw new IllegalArgumentException("Task status cannot be updated. Current status: " + task.getStatus());
+                }
+            } else {
+                throw new IllegalArgumentException("Deadline was not respected for Task with id: " + taskId);
+            }
+        } catch (EntityNotFoundException e) {
+            return new TaskResponseDTO("error", "Task not found with id: " + requestDTO.getTaskId());
+        } catch (IllegalArgumentException e) {
+            return new TaskResponseDTO("error", e.getMessage());
+        } catch (Exception e) {
+            return new TaskResponseDTO("error", "Error updating task status: " + e.getMessage());
+        }
+    }
+
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public TaskResponseDTO getTask(Long id) {
@@ -202,32 +251,6 @@ public class TaskServiceImpl implements TaskService {
                     .collect(Collectors.toList());
         } catch (Exception e) {
             return List.of(new TaskResponseDTO("error", "Error getting tasks: " + e.getMessage()));
-        }
-    }
-
-    @Override
-    public TaskResponseDTO updateTask(Long id, TaskRequestDTO taskRequestDTO) {
-        try {
-            Task existingTask = taskRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Task not found with id: " + id));
-            modelMapper.map(taskRequestDTO, existingTask);
-            existingTask = taskRepository.save(existingTask);
-            return modelMapper.map(existingTask, TaskResponseDTO.class);
-        } catch (EntityNotFoundException e) {
-            return new TaskResponseDTO("error", "Task not found with id: " + id);
-        } catch (Exception e) {
-            return new TaskResponseDTO("error", "Error updating task: " + e.getMessage());
-        }
-    }
-
-    @Override
-    public void deleteTask(Long id) {
-        try {
-            Task task = taskRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Task not found with id: " + id));
-            taskRepository.delete(task);
-        } catch (EntityNotFoundException e) {
-            System.out.println("Task not found with id: " + id);
-        } catch (Exception e) {
-            System.out.println("Error deleting task: " + e.getMessage());
         }
     }
 
