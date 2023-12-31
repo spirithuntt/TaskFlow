@@ -1,6 +1,7 @@
 package taskflow.service;
 
 import taskflow.dto.request.TaskRequestDTO;
+import taskflow.dto.request.TaskUpdateRequestDTO;
 import taskflow.dto.response.TaskResponseDTO;
 import taskflow.entities.User;
 import taskflow.entities.enums.TaskStatus;
@@ -19,6 +20,6 @@ public interface TaskService {
 
     void deleteTask(Long id);
 
-    TaskResponseDTO assignTaskToUser(Long id, TaskRequestDTO taskRequestDTO);
+    TaskResponseDTO assignTaskToUser(Long id, TaskUpdateRequestDTO taskUpdateRequestDTO);
 
 }

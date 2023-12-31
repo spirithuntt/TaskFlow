@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import taskflow.dto.request.TaskRequestDTO;
+import taskflow.dto.request.TaskUpdateRequestDTO;
 import taskflow.dto.response.TaskResponseDTO;
 import taskflow.service.TaskService;
 
@@ -52,12 +53,13 @@ public class TaskController {
     }
 
     @PutMapping("/{id}/assign")
-    public ResponseEntity<TaskResponseDTO> assignTaskToUser(@PathVariable Long id, @RequestBody TaskRequestDTO taskRequestDTO) {
-        TaskResponseDTO responseDTO = taskService.assignTaskToUser(id, taskRequestDTO);
+    public ResponseEntity<TaskResponseDTO> assignTaskToUser(@PathVariable Long id, @RequestBody TaskUpdateRequestDTO taskUpdateRequestDTO) {
+        TaskResponseDTO responseDTO = taskService.assignTaskToUser(id, taskUpdateRequestDTO);
         if ("error".equals(responseDTO.getStatus())) {
             return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
         } else {
             return ResponseEntity.ok(responseDTO);
         }
     }
+
 }
