@@ -15,6 +15,7 @@ import taskflow.repository.TaskRepository;
 import taskflow.repository.UserRepository;
 import taskflow.service.TaskReplacementService;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -146,12 +147,19 @@ public class TaskReplacementServiceImpl implements TaskReplacementService {
                 throw new IllegalArgumentException("Invalid userId provided for Task with id: " + taskId);
             }
 
-            // Check if the user has an approved TaskReplacement for this task
+            // Check if there is an approved TaskReplacement for this task
             boolean hasApprovedTaskReplacement = taskReplacementRepository.existsByTaskAndStatus(task, TaskReplacementStatus.APPROVED);
 
             if (hasApprovedTaskReplacement) {
                 // If there is an approved TaskReplacement, show an error
                 return new TaskReplacementResponseDTO("error", "This task has already been edited or deleted once");
+            }
+
+            // Check if it's less than 24 hours before the task's start date
+            LocalDate startDate = task.getStartDate();
+            LocalDate currentDate = LocalDate.now();
+            if (startDate != null && currentDate.plusDays(1).isAfter(startDate)) {
+                throw new IllegalArgumentException("Cannot create TaskReplacement less than 24 hours before the task's start date");
             }
 
             // Create TaskReplacement with EDIT action
@@ -180,6 +188,7 @@ public class TaskReplacementServiceImpl implements TaskReplacementService {
             return new TaskReplacementResponseDTO("error", "Error creating task replacement: " + e.getMessage());
         }
     }
+
 
 
 
