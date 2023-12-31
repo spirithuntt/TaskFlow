@@ -132,6 +132,11 @@ public class TaskReplacementServiceImpl implements TaskReplacementService {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
 
+            // Check if the user has enough tokens
+            if (user.getToken() <= 0) {
+                throw new IllegalArgumentException("User does not have enough tokens");
+            }
+
             Task task = taskRepository.findById(taskId)
                     .orElseThrow(() -> new EntityNotFoundException("Task not found with id: " + taskId));
 
@@ -141,16 +146,21 @@ public class TaskReplacementServiceImpl implements TaskReplacementService {
                 throw new IllegalArgumentException("Invalid userId provided for Task with id: " + taskId);
             }
 
-            // Check if the user has enough tokens
-            if (user.getToken() <= 0) {
-                throw new IllegalArgumentException("User does not have enough tokens");
+            // Check if the user has an approved TaskReplacement for this task
+            boolean hasApprovedTaskReplacement = taskReplacementRepository.existsByTaskAndStatus(task, TaskReplacementStatus.APPROVED);
+
+            if (hasApprovedTaskReplacement) {
+                // If there is an approved TaskReplacement, show an error
+                return new TaskReplacementResponseDTO("error", "This task has already been edited or deleted once");
             }
 
-            // Create TaskReplacement with EDIT action and OPEN status
+            // Create TaskReplacement with EDIT action
             TaskReplacement taskReplacement = new TaskReplacement();
             taskReplacement.setTask(task);
             taskReplacement.setDateTime(LocalDateTime.now());
-            taskReplacement.setOldUser(task.getAssignedTo()); // Set to assigned user for EDIT action
+
+            // Set OldUser as the user to whom the task is currently assigned
+            taskReplacement.setOldUser(task.getAssignedTo());
             taskReplacement.setNewUser(null); // Set to NULL for EDIT action
             taskReplacement.setAction(TaskAction.EDIT);
             taskReplacement.setStatus(TaskReplacementStatus.OPEN);
@@ -170,6 +180,7 @@ public class TaskReplacementServiceImpl implements TaskReplacementService {
             return new TaskReplacementResponseDTO("error", "Error creating task replacement: " + e.getMessage());
         }
     }
+
 
 
 }
