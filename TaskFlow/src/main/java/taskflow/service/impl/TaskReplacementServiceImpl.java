@@ -226,7 +226,15 @@ public class TaskReplacementServiceImpl implements TaskReplacementService {
                 taskReplacement.getTask().setAssignedTo(newUser);
             }
 
+            // Save the TaskReplacement
             taskReplacement = taskReplacementRepository.save(taskReplacement);
+
+            // Reduce the token of the old user by 1
+            User oldUser = taskReplacement.getOldUser();
+            if (oldUser != null && oldUser.getToken() > 0) {
+                oldUser.setToken(oldUser.getToken() - 1);
+                userRepository.save(oldUser);
+            }
 
             // Returning success message along with updated task replacement details
             TaskReplacementResponseDTO responseDTO = modelMapper.map(taskReplacement, TaskReplacementResponseDTO.class);
@@ -241,6 +249,7 @@ public class TaskReplacementServiceImpl implements TaskReplacementService {
             return new TaskReplacementResponseDTO("error", "Error approving task replacement: " + e.getMessage());
         }
     }
+
 
 
     @Override
