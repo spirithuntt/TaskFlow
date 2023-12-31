@@ -18,11 +18,6 @@ public class TaskReplacementController {
         this.taskReplacementService = taskReplacementService;
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTaskReplacementById(@PathVariable Long id) {
-        taskReplacementService.deleteTaskReplacementById(id);
-        return ResponseEntity.noContent().build();
-    }
 
     @PostMapping("/delete")
     public ResponseEntity<TaskReplacementResponseDTO> createDeleteTaskReplacement(@RequestBody TaskReplacementRequestDTO requestDTO) {

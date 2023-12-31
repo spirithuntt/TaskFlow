@@ -39,11 +39,6 @@ public class TaskReplacementServiceImpl implements TaskReplacementService {
     }
 
     @Override
-    public void deleteTaskReplacementById(Long id) {
-        taskReplacementRepository.deleteById(id);
-    }
-
-    @Override
     public TaskReplacementResponseDTO createDeleteTaskReplacement(TaskReplacementRequestDTO requestDTO) {
         try {
             Long taskId = requestDTO.getTaskId();
@@ -249,8 +244,6 @@ public class TaskReplacementServiceImpl implements TaskReplacementService {
             return new TaskReplacementResponseDTO("error", "Error approving task replacement: " + e.getMessage());
         }
     }
-
-
 
     @Override
     public TaskReplacementResponseDTO rejectTaskReplacement(RejectTaskReplacementRequestDTO requestDTO) {

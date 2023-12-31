@@ -6,7 +6,6 @@ import taskflow.dto.request.TaskReplacementRequestDTO;
 import taskflow.dto.response.TaskReplacementResponseDTO;
 
 public interface TaskReplacementService {
-    void deleteTaskReplacementById(Long id);
     TaskReplacementResponseDTO createDeleteTaskReplacement(TaskReplacementRequestDTO requestDTO);
     TaskReplacementResponseDTO createEditTaskReplacement(TaskReplacementRequestDTO requestDTO);
     TaskReplacementResponseDTO approveTaskReplacement(ApproveTaskReplacementRequestDTO requestDTO);
