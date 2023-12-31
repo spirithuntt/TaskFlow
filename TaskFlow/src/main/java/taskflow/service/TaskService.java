@@ -1,9 +1,6 @@
 package taskflow.service;
 
-import taskflow.dto.request.TaskAssignmentRequestDTO;
-import taskflow.dto.request.TaskRequestDTO;
-import taskflow.dto.request.TaskStatusUpdateRequestDTO;
-import taskflow.dto.request.TaskUpdateRequestDTO;
+import taskflow.dto.request.*;
 import taskflow.dto.response.TaskResponseDTO;
 import taskflow.entities.User;
 import taskflow.entities.enums.TaskStatus;
@@ -19,6 +16,8 @@ public interface TaskService {
     TaskResponseDTO assignTaskToSelf(TaskAssignmentRequestDTO assignmentDTO);
 
     TaskResponseDTO updateTaskStatusToDone(TaskStatusUpdateRequestDTO requestDTO);
+
+    TaskResponseDTO deleteTaskCreatedByMe(TaskDeletionRequestDTO deletionRequestDTO);
 
     TaskResponseDTO getTask(Long id);
 

@@ -3,10 +3,7 @@ package taskflow.service.impl;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import taskflow.dto.request.TaskAssignmentRequestDTO;
-import taskflow.dto.request.TaskRequestDTO;
-import taskflow.dto.request.TaskStatusUpdateRequestDTO;
-import taskflow.dto.request.TaskUpdateRequestDTO;
+import taskflow.dto.request.*;
 import taskflow.dto.response.TaskResponseDTO;
 import taskflow.entities.Tags;
 import taskflow.entities.Task;
@@ -246,6 +243,32 @@ public class TaskServiceImpl implements TaskService {
         }
     }
 
+    @Override
+    public TaskResponseDTO deleteTaskCreatedByMe(TaskDeletionRequestDTO deletionRequestDTO) {
+        try {
+            Long taskId = deletionRequestDTO.getTaskId();
+            Long userId = deletionRequestDTO.getUserId();
+
+            Task task = taskRepository.findById(taskId)
+                    .orElseThrow(() -> new EntityNotFoundException("Task not found with id: " + taskId));
+
+            Long createdById = task.getCreatedBy() != null ? task.getCreatedBy().getId() : null;
+
+            if (Objects.equals(userId, createdById)) {
+                // Delete the task if createdById matches userId
+                taskRepository.deleteById(taskId);
+                return new TaskResponseDTO("success", "Task deleted successfully");
+            } else {
+                throw new IllegalArgumentException("Task can only be deleted by the creator");
+            }
+        } catch (EntityNotFoundException e) {
+            return new TaskResponseDTO("error", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return new TaskResponseDTO("error", e.getMessage());
+        } catch (Exception e) {
+            return new TaskResponseDTO("error", "Error deleting task: " + e.getMessage());
+        }
+    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     @Override

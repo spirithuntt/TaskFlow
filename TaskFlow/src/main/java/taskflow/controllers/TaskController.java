@@ -4,10 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import taskflow.dto.request.TaskAssignmentRequestDTO;
-import taskflow.dto.request.TaskRequestDTO;
-import taskflow.dto.request.TaskStatusUpdateRequestDTO;
-import taskflow.dto.request.TaskUpdateRequestDTO;
+import taskflow.dto.request.*;
 import taskflow.dto.response.TaskResponseDTO;
 import taskflow.service.TaskService;
 
@@ -54,6 +51,16 @@ public class TaskController {
     @PutMapping("/status/done")
     public ResponseEntity<TaskResponseDTO> updateTaskStatusToDone(@RequestBody TaskStatusUpdateRequestDTO requestDTO) {
         TaskResponseDTO responseDTO = taskService.updateTaskStatusToDone(requestDTO);
+        if ("error".equals(responseDTO.getStatus())) {
+            return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
+        } else {
+            return ResponseEntity.ok(responseDTO);
+        }
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<TaskResponseDTO> deleteTaskCreatedByMe(@RequestBody TaskDeletionRequestDTO deletionRequestDTO) {
+        TaskResponseDTO responseDTO = taskService.deleteTaskCreatedByMe(deletionRequestDTO);
         if ("error".equals(responseDTO.getStatus())) {
             return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
         } else {
