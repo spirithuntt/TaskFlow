@@ -17,6 +17,7 @@ import taskflow.service.TaskService;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -137,26 +138,47 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<TaskResponseDTO> getTasksByUser(User user) {
+    public TaskResponseDTO assignTaskToUser(Long id, TaskRequestDTO taskRequestDTO) {
         try {
-            List<Task> tasks = taskRepository.findByAssignedTo(user);
-            return tasks.stream()
-                    .map(task -> modelMapper.map(task, TaskResponseDTO.class))
-                    .collect(Collectors.toList());
+            Task existingTask = taskRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Task not found with id: " + id));
+
+            // Check if the provided createdById is the same as the one in the existing task
+            Long providedCreatedById = taskRequestDTO.getCreatedById();
+            if (providedCreatedById == null || !Objects.equals(existingTask.getCreatedBy().getId(), providedCreatedById)) {
+                throw new IllegalArgumentException("Invalid createdById provided");
+            }
+
+            // Check if the assignment is at least 3 days before the start date
+            LocalDate currentDate = LocalDate.now();
+            LocalDate startDate = existingTask.getStartDate();
+            if (startDate != null && !currentDate.plusDays(3).isBefore(startDate)) {
+                throw new IllegalArgumentException("Task must be assigned at least 3 days before the start date");
+            }
+
+            // Assign the task to the specified user
+            Long assignedToId = taskRequestDTO.getAssignedToId();
+            if (assignedToId != null) {
+                User assignedTo = userRepository.findById(assignedToId)
+                        .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + assignedToId));
+                existingTask.setAssignedTo(assignedTo);
+
+                existingTask = taskRepository.save(existingTask);
+
+                // Returning success message along with task details
+                TaskResponseDTO responseDTO = modelMapper.map(existingTask, TaskResponseDTO.class);
+                responseDTO.setStatus("success");
+                responseDTO.setMessage("Task assigned successfully");
+                return responseDTO;
+            } else {
+                throw new IllegalArgumentException("AssignedToId cannot be null");
+            }
+        } catch (EntityNotFoundException e) {
+            return new TaskResponseDTO("error", "Task not found with id: " + id);
+        } catch (IllegalArgumentException e) {
+            return new TaskResponseDTO("error", e.getMessage());
         } catch (Exception e) {
-            return List.of(new TaskResponseDTO("error", "Error getting tasks by user: " + e.getMessage()));
+            return new TaskResponseDTO("error", "Error assigning task: " + e.getMessage());
         }
     }
 
-    @Override
-    public List<TaskResponseDTO> getTasksByStatus(TaskStatus status) {
-        try {
-            List<Task> tasks = taskRepository.findByStatus(status);
-            return tasks.stream()
-                    .map(task -> modelMapper.map(task, TaskResponseDTO.class))
-                    .collect(Collectors.toList());
-        } catch (Exception e) {
-            return List.of(new TaskResponseDTO("error", "Error getting tasks by status: " + e.getMessage()));
-        }
-    }
 }

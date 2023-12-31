@@ -19,8 +19,6 @@ public interface TaskService {
 
     void deleteTask(Long id);
 
-    List<TaskResponseDTO> getTasksByUser(User user);
-
-    List<TaskResponseDTO> getTasksByStatus(TaskStatus status);
+    TaskResponseDTO assignTaskToUser(Long id, TaskRequestDTO taskRequestDTO);
 
 }

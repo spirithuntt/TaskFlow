@@ -51,23 +51,13 @@ public class TaskController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-//    @GetMapping("/byUser/{userId}")
-//    public ResponseEntity<List<TaskResponseDTO>> getTasksByUser(@PathVariable Long userId) {
-////         Assume you have a User entity and userId can be used to retrieve the user from the database
-//         User user = userService.getUserById(userId);
-//         List<TaskResponseDTO> tasks = taskService.getTasksByUser(user);
-//
-//        // For the sake of simplicity, returning an empty list
-//        return ResponseEntity.ok(List.of());
-//    }
-//
-//    @GetMapping("/byStatus/{status}")
-//    public ResponseEntity<List<TaskResponseDTO>> getTasksByStatus(@PathVariable String status) {
-//        // Assuming TaskStatus is an enum and can be parsed from the string
-//         TaskStatus taskStatus = TaskStatus.valueOf(status);
-//         List<TaskResponseDTO> tasks = taskService.getTasksByStatus(taskStatus);
-//
-//        // For the sake of simplicity, returning an empty list
-//        return ResponseEntity.ok(List.of());
-//    }
+    @PutMapping("/{id}/assign")
+    public ResponseEntity<TaskResponseDTO> assignTaskToUser(@PathVariable Long id, @RequestBody TaskRequestDTO taskRequestDTO) {
+        TaskResponseDTO responseDTO = taskService.assignTaskToUser(id, taskRequestDTO);
+        if ("error".equals(responseDTO.getStatus())) {
+            return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
+        } else {
+            return ResponseEntity.ok(responseDTO);
+        }
+    }
 }
