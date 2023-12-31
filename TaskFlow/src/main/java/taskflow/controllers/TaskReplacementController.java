@@ -1,13 +1,13 @@
 package taskflow.controllers;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import taskflow.dto.request.ApproveTaskReplacementRequestDTO;
+import taskflow.dto.request.RejectTaskReplacementRequestDTO;
 import taskflow.dto.request.TaskReplacementRequestDTO;
 import taskflow.dto.response.TaskReplacementResponseDTO;
 import taskflow.service.TaskReplacementService;
-import taskflow.service.TaskService;
 
 @RestController
 @RequestMapping("/api/v1/task-replacements")
@@ -44,5 +44,20 @@ public class TaskReplacementController {
         }
     }
 
+    @PostMapping("/status/approve")
+    public ResponseEntity<TaskReplacementResponseDTO> approveTaskReplacement(
+            @RequestBody ApproveTaskReplacementRequestDTO requestDTO) {
+        TaskReplacementResponseDTO responseDTO = taskReplacementService.approveTaskReplacement(requestDTO);
+        HttpStatus status = responseDTO.getStatus().equals("success") ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
+        return new ResponseEntity<>(responseDTO, status);
+    }
+
+    @PostMapping("/status/reject")
+    public ResponseEntity<TaskReplacementResponseDTO> rejectTaskReplacement(
+            @RequestBody RejectTaskReplacementRequestDTO requestDTO) {
+        TaskReplacementResponseDTO responseDTO = taskReplacementService.rejectTaskReplacement(requestDTO);
+        HttpStatus status = responseDTO.getStatus().equals("success") ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
+        return new ResponseEntity<>(responseDTO, status);
+    }
 
 }

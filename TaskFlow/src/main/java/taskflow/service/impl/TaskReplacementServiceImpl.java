@@ -3,11 +3,14 @@ package taskflow.service.impl;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import taskflow.dto.request.ApproveTaskReplacementRequestDTO;
+import taskflow.dto.request.RejectTaskReplacementRequestDTO;
 import taskflow.dto.request.TaskReplacementRequestDTO;
 import taskflow.dto.response.TaskReplacementResponseDTO;
 import taskflow.entities.Task;
 import taskflow.entities.TaskReplacement;
 import taskflow.entities.User;
+import taskflow.entities.enums.Role;
 import taskflow.entities.enums.TaskAction;
 import taskflow.entities.enums.TaskReplacementStatus;
 import taskflow.repository.TaskReplacementRepository;
@@ -188,6 +191,94 @@ public class TaskReplacementServiceImpl implements TaskReplacementService {
             return new TaskReplacementResponseDTO("error", "Error creating task replacement: " + e.getMessage());
         }
     }
+
+    @Override
+    public TaskReplacementResponseDTO approveTaskReplacement(ApproveTaskReplacementRequestDTO requestDTO) {
+        try {
+            Long taskReplacementId = requestDTO.getTaskReplacementId();
+            Long userId = requestDTO.getUserId();
+            Long newUserId = requestDTO.getNewUserId();
+
+            TaskReplacement taskReplacement = taskReplacementRepository.findById(taskReplacementId)
+                    .orElseThrow(() -> new EntityNotFoundException("TaskReplacement not found with id: " + taskReplacementId));
+
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+
+            // Check if the user has admin role
+            if (!user.getRole().equals(Role.ADMIN)) {
+                throw new RuntimeException("Unauthorized access: User does not have admin role");
+            }
+
+            // Check if the TaskReplacement has action EDIT and status OPEN
+            if (taskReplacement.getAction() != TaskAction.EDIT || taskReplacement.getStatus() != TaskReplacementStatus.OPEN) {
+                throw new IllegalArgumentException("Invalid TaskReplacement state for approval");
+            }
+
+            // Update the TaskReplacementStatus to APPROVED
+            taskReplacement.setStatus(TaskReplacementStatus.APPROVED);
+
+            // If there is a new user specified, update the task's assigned user
+            if (newUserId != null) {
+                User newUser = userRepository.findById(newUserId)
+                        .orElseThrow(() -> new EntityNotFoundException("New user not found with id: " + newUserId));
+                taskReplacement.setNewUser(newUser);
+                taskReplacement.getTask().setAssignedTo(newUser);
+            }
+
+            taskReplacement = taskReplacementRepository.save(taskReplacement);
+
+            // Returning success message along with updated task replacement details
+            TaskReplacementResponseDTO responseDTO = modelMapper.map(taskReplacement, TaskReplacementResponseDTO.class);
+            responseDTO.setStatus("success");
+            responseDTO.setMessage("TaskReplacement approved successfully");
+            return responseDTO;
+        } catch (EntityNotFoundException e) {
+            return new TaskReplacementResponseDTO("error", "TaskReplacement not found with id: " + requestDTO.getTaskReplacementId());
+        } catch (RuntimeException e) {
+            return new TaskReplacementResponseDTO("error", e.getMessage());
+        } catch (Exception e) {
+            return new TaskReplacementResponseDTO("error", "Error approving task replacement: " + e.getMessage());
+        }
+    }
+
+
+    @Override
+    public TaskReplacementResponseDTO rejectTaskReplacement(RejectTaskReplacementRequestDTO requestDTO) {
+        try {
+            Long taskReplacementId = requestDTO.getTaskReplacementId();
+            Long userId = requestDTO.getUserId();
+
+            TaskReplacement taskReplacement = taskReplacementRepository.findById(taskReplacementId)
+                    .orElseThrow(() -> new EntityNotFoundException("TaskReplacement not found with id: " + taskReplacementId));
+
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+
+            // Check if the user has admin role
+            if (!user.getRole().equals(Role.ADMIN)) {
+                throw new RuntimeException("Unauthorized access: User does not have admin role");
+            }
+
+            // Update the TaskReplacementStatus to REJECTED
+            taskReplacement.setStatus(TaskReplacementStatus.REJECTED);
+            taskReplacement = taskReplacementRepository.save(taskReplacement);
+
+            // Returning success message along with updated task replacement details
+            TaskReplacementResponseDTO responseDTO = modelMapper.map(taskReplacement, TaskReplacementResponseDTO.class);
+            responseDTO.setStatus("success");
+            responseDTO.setMessage("TaskReplacement rejected successfully");
+            return responseDTO;
+        } catch (EntityNotFoundException e) {
+            return new TaskReplacementResponseDTO("error", "TaskReplacement not found with id: " + requestDTO.getTaskReplacementId());
+        } catch (RuntimeException e) {
+            return new TaskReplacementResponseDTO("error", e.getMessage());
+        } catch (Exception e) {
+            return new TaskReplacementResponseDTO("error", "Error rejecting task replacement: " + e.getMessage());
+        }
+    }
+
+
 
 
 
