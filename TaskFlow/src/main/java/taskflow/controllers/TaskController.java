@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import taskflow.dto.request.TaskAssignmentRequestDTO;
 import taskflow.dto.request.TaskRequestDTO;
 import taskflow.dto.request.TaskUpdateRequestDTO;
 import taskflow.dto.response.TaskResponseDTO;
@@ -28,6 +29,29 @@ public class TaskController {
         return new ResponseEntity<>(createdTask, HttpStatus.CREATED);
     }
 
+    @PutMapping("/{id}/assign")
+    public ResponseEntity<TaskResponseDTO> assignTaskToUser(@PathVariable Long id, @RequestBody TaskUpdateRequestDTO taskUpdateRequestDTO) {
+        TaskResponseDTO responseDTO = taskService.assignTaskToUser(id, taskUpdateRequestDTO);
+        if ("error".equals(responseDTO.getStatus())) {
+            return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
+        } else {
+            return ResponseEntity.ok(responseDTO);
+        }
+    }
+
+    @PutMapping("/assign")
+    public ResponseEntity<TaskResponseDTO> assignTaskToUser(@RequestBody TaskAssignmentRequestDTO assignmentDTO) {
+        TaskResponseDTO responseDTO = taskService.assignTaskToSelf(assignmentDTO);
+
+        if ("error".equals(responseDTO.getStatus())) {
+            return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
+        } else {
+            return ResponseEntity.ok(responseDTO);
+        }
+    }
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     @GetMapping("/{id}")
     public ResponseEntity<TaskResponseDTO> getTask(@PathVariable Long id) {
         TaskResponseDTO task = taskService.getTask(id);
@@ -52,14 +76,6 @@ public class TaskController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping("/{id}/assign")
-    public ResponseEntity<TaskResponseDTO> assignTaskToUser(@PathVariable Long id, @RequestBody TaskUpdateRequestDTO taskUpdateRequestDTO) {
-        TaskResponseDTO responseDTO = taskService.assignTaskToUser(id, taskUpdateRequestDTO);
-        if ("error".equals(responseDTO.getStatus())) {
-            return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
-        } else {
-            return ResponseEntity.ok(responseDTO);
-        }
-    }
+
 
 }

@@ -1,5 +1,6 @@
 package taskflow.service;
 
+import taskflow.dto.request.TaskAssignmentRequestDTO;
 import taskflow.dto.request.TaskRequestDTO;
 import taskflow.dto.request.TaskUpdateRequestDTO;
 import taskflow.dto.response.TaskResponseDTO;
@@ -12,6 +13,10 @@ public interface TaskService {
 
     TaskResponseDTO createTask(TaskRequestDTO taskRequestDTO);
 
+    TaskResponseDTO assignTaskToUser(Long id, TaskUpdateRequestDTO taskUpdateRequestDTO);
+
+    TaskResponseDTO assignTaskToSelf(TaskAssignmentRequestDTO assignmentDTO);
+
     TaskResponseDTO getTask(Long id);
 
     List<TaskResponseDTO> getAllTasks();
@@ -20,6 +25,5 @@ public interface TaskService {
 
     void deleteTask(Long id);
 
-    TaskResponseDTO assignTaskToUser(Long id, TaskUpdateRequestDTO taskUpdateRequestDTO);
 
 }

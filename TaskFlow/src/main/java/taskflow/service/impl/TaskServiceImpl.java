@@ -3,6 +3,7 @@ package taskflow.service.impl;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import taskflow.dto.request.TaskAssignmentRequestDTO;
 import taskflow.dto.request.TaskRequestDTO;
 import taskflow.dto.request.TaskUpdateRequestDTO;
 import taskflow.dto.response.TaskResponseDTO;
@@ -141,8 +142,45 @@ public class TaskServiceImpl implements TaskService {
         }
     }
 
+    @Override
+    public TaskResponseDTO assignTaskToSelf(TaskAssignmentRequestDTO assignmentDTO) {
+        try {
+            Long taskId = assignmentDTO.getTaskId();
+            Task existingTask = taskRepository.findById(taskId)
+                    .orElseThrow(() -> new EntityNotFoundException("Task not found with id: " + taskId));
 
+            // Check if the task is already assigned to someone else
+            if (existingTask.getAssignedTo() != null) {
+                throw new IllegalArgumentException("Task is already assigned to another user");
+            }
 
+            // Assign the task to the specified user
+            Long userId = assignmentDTO.getUserId();
+            if (userId != null) {
+                User assignedTo = userRepository.findById(userId)
+                        .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+                existingTask.setAssignedTo(assignedTo);
+
+                existingTask = taskRepository.save(existingTask);
+
+                // Returning success message along with task details
+                TaskResponseDTO responseDTO = modelMapper.map(existingTask, TaskResponseDTO.class);
+                responseDTO.setStatus("success");
+                responseDTO.setMessage("Task assigned successfully");
+                return responseDTO;
+            } else {
+                throw new IllegalArgumentException("UserId cannot be null");
+            }
+        } catch (EntityNotFoundException e) {
+            return new TaskResponseDTO("error", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return new TaskResponseDTO("error", e.getMessage());
+        } catch (Exception e) {
+            return new TaskResponseDTO("error", "Error assigning task: " + e.getMessage());
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public TaskResponseDTO getTask(Long id) {
         try {
