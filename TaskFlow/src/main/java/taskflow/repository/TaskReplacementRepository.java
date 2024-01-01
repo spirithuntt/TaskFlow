@@ -10,6 +10,7 @@ import taskflow.entities.enums.TaskAction;
 import taskflow.entities.enums.TaskReplacementStatus;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface TaskReplacementRepository extends JpaRepository<TaskReplacement, Long> {
 
@@ -29,5 +30,7 @@ public interface TaskReplacementRepository extends JpaRepository<TaskReplacement
             @Param("status") TaskReplacementStatus status,
             @Param("dateTime") LocalDateTime dateTime
     );
+
+    List<TaskReplacement> findByStatusAndDateTimeBefore(TaskReplacementStatus status, LocalDateTime dateTime);
 
 }
