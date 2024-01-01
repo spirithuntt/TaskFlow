@@ -1,6 +1,7 @@
 package taskflow.service;
 
 import taskflow.dto.request.*;
+import taskflow.dto.response.TaskOverviewResponseDTO;
 import taskflow.dto.response.TaskResponseDTO;
 import taskflow.entities.User;
 import taskflow.entities.enums.TaskStatus;
@@ -19,9 +20,7 @@ public interface TaskService {
 
     TaskResponseDTO deleteTaskCreatedByMe(TaskDeletionRequestDTO deletionRequestDTO);
 
-    TaskResponseDTO getTask(Long id);
-
-    List<TaskResponseDTO> getAllTasks();
+    List<TaskOverviewResponseDTO> getAllTasks();
 
 
 

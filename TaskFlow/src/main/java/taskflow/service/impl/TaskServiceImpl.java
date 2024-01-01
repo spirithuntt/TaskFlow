@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import taskflow.dto.request.*;
+import taskflow.dto.response.TaskOverviewResponseDTO;
 import taskflow.dto.response.TaskResponseDTO;
 import taskflow.entities.Tags;
 import taskflow.entities.Task;
@@ -271,28 +272,14 @@ public class TaskServiceImpl implements TaskService {
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public TaskResponseDTO getTask(Long id) {
-        try {
-            Task task = taskRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Task not found with id: " + id));
-            return modelMapper.map(task, TaskResponseDTO.class);
-        } catch (EntityNotFoundException e) {
-            return new TaskResponseDTO("error", "Task not found with id: " + id);
-        } catch (Exception e) {
-            return new TaskResponseDTO("error", "Error getting task: " + e.getMessage());
-        }
-    }
 
-    @Override
-    public List<TaskResponseDTO> getAllTasks() {
-        try {
-            List<Task> taskList = taskRepository.findAll();
-            return taskList.stream()
-                    .map(task -> modelMapper.map(task, TaskResponseDTO.class))
-                    .collect(Collectors.toList());
-        } catch (Exception e) {
-            return List.of(new TaskResponseDTO("error", "Error getting tasks: " + e.getMessage()));
-        }
+    public List<TaskOverviewResponseDTO> getAllTasks() {
+        List<Task> tasks = taskRepository.findAll();
+        List<TaskOverviewResponseDTO> taskOverviewResponseDTOList = tasks.stream()
+                .map(task -> modelMapper.map(task, TaskOverviewResponseDTO.class))
+                .collect(Collectors.toList());
+
+        return taskOverviewResponseDTOList;
     }
 
 

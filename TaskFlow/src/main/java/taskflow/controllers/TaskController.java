@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import taskflow.dto.request.*;
+import taskflow.dto.response.TaskOverviewResponseDTO;
 import taskflow.dto.response.TaskResponseDTO;
 import taskflow.service.TaskService;
 
@@ -70,18 +71,11 @@ public class TaskController {
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    @GetMapping("/{id}")
-    public ResponseEntity<TaskResponseDTO> getTask(@PathVariable Long id) {
-        TaskResponseDTO task = taskService.getTask(id);
-        return ResponseEntity.ok(task);
+    @GetMapping("/overview")
+    public ResponseEntity<List<TaskOverviewResponseDTO>> getAllTasksOverview() {
+        List<TaskOverviewResponseDTO> taskOverviewList = taskService.getAllTasks();
+        return ResponseEntity.ok(taskOverviewList);
     }
-
-    @GetMapping
-    public ResponseEntity<List<TaskResponseDTO>> getAllTasks() {
-        List<TaskResponseDTO> taskList = taskService.getAllTasks();
-        return ResponseEntity.ok(taskList);
-    }
-
 
 
 }
