@@ -42,8 +42,30 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
+
         var user = userRepository.findByEmail(request.getEmail()).orElseThrow();
+
+        // Fetch more details from the user object
+        Long userId = user.getId();
+        String firstName = user.getFirstName();
+        String lastName = user.getLastName();
+        String email = user.getEmail();
+        int tokens = user.getToken();
+        Role role = user.getRole();
+
+        // Generate JWT token
         var jwtToken = jwtService.generateToken(user);
-        return AuthenticationResponse.builder().token(jwtToken).build();
+
+        // Create AuthenticationResponse with additional user information
+        return AuthenticationResponse.builder()
+                .token(jwtToken)
+                .userId(userId)
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .tokens(tokens)
+                .role(role)
+                .build();
     }
+
 }

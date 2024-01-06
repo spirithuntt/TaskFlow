@@ -12,3 +12,4 @@ public interface AuthenticationService {
 
         AuthenticationResponse authenticate(AuthenticationRequest user);
 }
+
