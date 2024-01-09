@@ -9,6 +9,8 @@ import taskflow.dto.request.TaskReplacementRequestDTO;
 import taskflow.dto.response.TaskReplacementResponseDTO;
 import taskflow.service.TaskReplacementService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/task-replacements")
 public class TaskReplacementController {
@@ -55,4 +57,8 @@ public class TaskReplacementController {
         return new ResponseEntity<>(responseDTO, status);
     }
 
+    @GetMapping
+    public List<TaskReplacementResponseDTO> getAllTaskReplacements() {
+        return taskReplacementService.getAllTaskReplacements();
+    }
 }

@@ -20,6 +20,8 @@ import taskflow.service.TaskReplacementService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -280,7 +282,16 @@ public class TaskReplacementServiceImpl implements TaskReplacementService {
         }
     }
 
+    @Override
+    public List<TaskReplacementResponseDTO> getAllTaskReplacements() {
+        List<TaskReplacementResponseDTO> list = new ArrayList<>();
 
+        taskReplacementRepository.findAll().forEach(task -> {
+            list.add(modelMapper.map(task, TaskReplacementResponseDTO.class));
+        });
+
+        return list;
+    }
 
 
 
