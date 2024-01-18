@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd"
         objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
-    <changeSet id="1703672373497-3" author="Salah">
+    <changeSet id="1705500592377-1" author="nouhaila (generated)">
         <createTable tableName="tags">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_tags"/>
@@ -13,7 +13,7 @@
             <column name="name" type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
-    <changeSet id="1703672373497-4" author="Salah">
+    <changeSet id="1705500592377-2" author="nouhaila (generated)">
         <createTable tableName="task">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_task"/>
@@ -28,7 +28,7 @@
             <column name="assigned_to_id" type="BIGINT"/>
         </createTable>
     </changeSet>
-    <changeSet id="1703672373497-5" author="Salah">
+    <changeSet id="1705500592377-3" author="nouhaila (generated)">
         <createTable tableName="task_replacement">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_taskreplacement"/>
@@ -41,7 +41,7 @@
             <column name="status" type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
-    <changeSet id="1703672373497-6" author="Salah">
+    <changeSet id="1705500592377-4" author="nouhaila (generated)">
         <createTable tableName="tasks_to_tags">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_tasks_to_tags"/>
@@ -50,48 +50,55 @@
             <column name="tag_id" type="BIGINT"/>
         </createTable>
     </changeSet>
-    <changeSet id="1703672373497-7" author="Salah)">
+    <changeSet id="1705500592377-5" author="nouhaila (generated)">
+        <createTable tableName="user">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_user"/>
+            </column>
+            <column name="first_name" type="VARCHAR(255)"/>
+            <column name="last_name" type="VARCHAR(255)"/>
+            <column name="email" type="VARCHAR(255)"/>
+            <column name="token" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="VARCHAR(255)"/>
+            <column name="role" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1705500592377-6" author="nouhaila (generated)">
         <addForeignKeyConstraint baseColumnNames="new_user_id" baseTableName="task_replacement"
                                  constraintName="FK_TASKREPLACEMENT_ON_NEW_USER" referencedColumnNames="id"
                                  referencedTableName="user"/>
     </changeSet>
-    <changeSet id="1703672373497-8" author="Salah">
+    <changeSet id="1705500592377-7" author="nouhaila (generated)">
         <addForeignKeyConstraint baseColumnNames="old_user_id" baseTableName="task_replacement"
                                  constraintName="FK_TASKREPLACEMENT_ON_OLD_USER" referencedColumnNames="id"
                                  referencedTableName="user"/>
     </changeSet>
-    <changeSet id="1703672373497-9" author="Salah">
+    <changeSet id="1705500592377-8" author="nouhaila (generated)">
         <addForeignKeyConstraint baseColumnNames="task_id" baseTableName="task_replacement"
                                  constraintName="FK_TASKREPLACEMENT_ON_TASK" referencedColumnNames="id"
                                  referencedTableName="task"/>
     </changeSet>
-    <changeSet id="1703672373497-10" author="Salah">
+    <changeSet id="1705500592377-9" author="nouhaila (generated)">
         <addForeignKeyConstraint baseColumnNames="tag_id" baseTableName="tasks_to_tags"
                                  constraintName="FK_TASKS_TO_TAGS_ON_TAG" referencedColumnNames="id"
                                  referencedTableName="tags"/>
     </changeSet>
-    <changeSet id="1703672373497-11" author="Salah">
+    <changeSet id="1705500592377-10" author="nouhaila (generated)">
         <addForeignKeyConstraint baseColumnNames="task_id" baseTableName="tasks_to_tags"
                                  constraintName="FK_TASKS_TO_TAGS_ON_TASK" referencedColumnNames="id"
                                  referencedTableName="task"/>
     </changeSet>
-    <changeSet id="1703672373497-12" author="Salah">
+    <changeSet id="1705500592377-11" author="nouhaila (generated)">
         <addForeignKeyConstraint baseColumnNames="assigned_to_id" baseTableName="task"
                                  constraintName="FK_TASK_ON_ASSIGNED_TO" referencedColumnNames="id"
                                  referencedTableName="user"/>
     </changeSet>
-    <changeSet id="1703672373497-13" author="Salah">
+    <changeSet id="1705500592377-12" author="nouhaila (generated)">
         <addForeignKeyConstraint baseColumnNames="created_by_id" baseTableName="task"
                                  constraintName="FK_TASK_ON_CREATED_BY" referencedColumnNames="id"
                                  referencedTableName="user"/>
-    </changeSet>
-    <changeSet id="1703672373497-1" author="Salah">
-        <dropColumn columnName="role" tableName="user"/>
-    </changeSet>
-    <changeSet id="1703672373497-2" author="Salah">
-        <addColumn tableName="user">
-            <column name="role" type="VARCHAR(255)"/>
-        </addColumn>
     </changeSet>
 
 </databaseChangeLog>

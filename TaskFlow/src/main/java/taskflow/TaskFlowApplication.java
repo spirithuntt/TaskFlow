@@ -20,5 +20,4 @@ public class TaskFlowApplication {
     public ModelMapper modelMapper(){
         return new ModelMapper();
     }
-
 }
