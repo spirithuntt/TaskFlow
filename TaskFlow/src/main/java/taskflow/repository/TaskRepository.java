@@ -2,6 +2,7 @@ package taskflow.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import taskflow.entities.Task;
 import taskflow.entities.User;
 import taskflow.entities.enums.TaskStatus;
@@ -14,7 +15,9 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findByAssignedTo(User user);
     List<Task> findByStatus(TaskStatus status);
 
-    @Query("SELECT t FROM Task t WHERE t.deadline < :currentDate AND t.status <> 'EXPIRED'")
-    List<Task> findTasksToExpire(LocalDate currentDate);
+    //! find if date is passed
+    @Query(value = "SELECT * FROM task WHERE deadline < :currentDate AND status <> 'EXPIRED'", nativeQuery = true)
+    List<Task> findTasksToExpire(@Param("currentDate") LocalDate currentDate);
+
 
 }

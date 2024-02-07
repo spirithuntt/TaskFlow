@@ -17,13 +17,8 @@ public interface TaskReplacementRepository extends JpaRepository<TaskReplacement
     boolean existsByTaskAndActionAndStatus(Task task, TaskAction action, TaskReplacementStatus status);
 
     boolean existsByTaskAndStatus(Task task, TaskReplacementStatus status);
-
-    @Query("SELECT CASE WHEN COUNT(tr) > 0 THEN true ELSE false END " +
-            "FROM TaskReplacement tr " +
-            "WHERE tr.oldUser = :user " +
-            "AND tr.action = :action " +
-            "AND tr.status = :status " +
-            "AND tr.dateTime > :dateTime")
+    //!if in that time there is a task replacement with status open, then the user cannot create a new delete task replacement for that task
+    @Query("SELECT CASE WHEN COUNT(tr) > 0 THEN true ELSE false END " + "FROM TaskReplacement tr " + "WHERE tr.oldUser = :user " + "AND tr.action = :action " + "AND tr.status = :status " + "AND tr.dateTime > :dateTime")
     boolean existsByOldUserAndActionAndStatusAndDateTimeAfter(
             @Param("user") User user,
             @Param("action") TaskAction action,

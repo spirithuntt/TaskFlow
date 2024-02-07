@@ -19,7 +19,10 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
+
+//!OncePerRequestFilter to intercept and process incoming requests before they reach the main application logic.
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    //!check if the request has a valid JWT token in the Authorization header
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;

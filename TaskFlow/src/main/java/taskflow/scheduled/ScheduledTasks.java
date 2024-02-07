@@ -27,17 +27,16 @@ public class ScheduledTasks {
         this.taskRepository = taskRepository;
         this.taskReplacementRepository = taskReplacementRepository;
     }
-
-    @Scheduled(cron = "0 0 0 * * *") // Run every midnight
+    @Scheduled(cron = "0 0 0 * * *") //! run every midnight
     public void updateTokensAndExpireTasks() {
-        // Update tokens for all users
+        //! update tokens for all users
         List<User> users = userRepository.findAll();
         for (User user : users) {
             user.setToken(2);
         }
         userRepository.saveAll(users);
 
-        // Expire the tasks that has passed the deadline
+        //! exipre if date is passed
         LocalDate currentDate = LocalDate.now();
         List<Task> expiredTasks = taskRepository.findTasksToExpire(currentDate);
         for (Task task : expiredTasks) {
@@ -46,18 +45,17 @@ public class ScheduledTasks {
         taskRepository.saveAll(expiredTasks);
     }
 
-    @Scheduled(cron = "0 0 0,12 * * *") // Run every 12 hours
+    @Scheduled(cron = "0 0 0,12 * * *") //! run every 12h
     public void checkAndCloseTaskReplacements() {
-        // Find TaskReplacements with status OPEN and DateTime older than 12 hours
+        //! find if status open and time<12 hours
         List<TaskReplacement> openTaskReplacements = taskReplacementRepository.findByStatusAndDateTimeBefore(
                 TaskReplacementStatus.OPEN, LocalDateTime.now().minusHours(12));
 
         for (TaskReplacement taskReplacement : openTaskReplacements) {
-            // Change status to CLOSED
             taskReplacement.setStatus(TaskReplacementStatus.CLOSED);
             taskReplacementRepository.save(taskReplacement);
 
-            // Give the user 2 tokens as bonus
+            //! old user gets 2 tokens
             User oldUser = taskReplacement.getOldUser();
             if (oldUser != null) {
                 oldUser.setToken(oldUser.getToken() + 2);

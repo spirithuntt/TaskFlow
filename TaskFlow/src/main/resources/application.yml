@@ -8,7 +8,7 @@ server:
 # Spring Configuration
 spring:
 
-  #to enable colors when you run your app outside intellij
+  # To enable colors when you run your app outside IntelliJ
   output:
     ansi:
       enabled: always
@@ -18,6 +18,7 @@ spring:
     url: jdbc:mysql://localhost:3306/taskflow?createDatabaseIfNotExist=true&serverTimezone=UTC
     username: root
     password:
+
   jpa:
     show-sql: true
     hibernate:
@@ -25,6 +26,16 @@ spring:
     properties:
       hibernate:
         globally_quoted_identifiers: true
+
   liquibase:
     enabled: false
     change-log: db/master.xml
+
+# GitHub login
+security:
+  oauth2:
+    client:
+      registration:
+        github:
+          clientId: "Iv1.354c9ff62a1512ba"
+          clientSecret: "a4cbce92b14aa26ba18e2eb3029bfc3fd886e9a6"

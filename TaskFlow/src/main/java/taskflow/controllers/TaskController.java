@@ -70,7 +70,6 @@ public class TaskController {
     }
 
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     @GetMapping("/overview")
     public ResponseEntity<List<TaskOverviewResponseDTO>> getAllTasksOverview() {
         List<TaskOverviewResponseDTO> taskOverviewList = taskService.getAllTasks();

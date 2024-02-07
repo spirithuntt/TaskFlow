@@ -49,7 +49,7 @@ public class TaskReplacementServiceImpl implements TaskReplacementService {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
 
-            // Check if the user has enough tokens
+            //! Check if the user has enough tokens
             if (user.getToken() <= 0) {
                 throw new IllegalArgumentException("User does not have enough tokens");
             }
@@ -57,13 +57,13 @@ public class TaskReplacementServiceImpl implements TaskReplacementService {
             Task task = taskRepository.findById(taskId)
                     .orElseThrow(() -> new EntityNotFoundException("Task not found with id: " + taskId));
 
-            // Check if the provided userId matches the assignedToId of the task
+            //! Check if the provided userId matches the assignedToId of the task
             Long assignedToId = task.getAssignedTo() != null ? task.getAssignedTo().getId() : null;
             if (!Objects.equals(userId, assignedToId)) {
                 throw new IllegalArgumentException("Invalid userId provided for Task with id: " + taskId);
             }
 
-            // Check if the user has already performed a DELETE action this month
+            //! Check if the user has already performed a DELETE action this month
             boolean hasPerformedDeleteAction = taskReplacementRepository.existsByOldUserAndActionAndStatusAndDateTimeAfter(
                     user,
                     TaskAction.DELETE,
@@ -72,11 +72,11 @@ public class TaskReplacementServiceImpl implements TaskReplacementService {
             );
 
             if (hasPerformedDeleteAction) {
-                // If the user has already performed a DELETE action this month
+                //! If the user has already performed a DELETE action this month
                 return new TaskReplacementResponseDTO("error", "User can only perform one DELETE action per month");
             }
 
-            // Check if the task has already been approved for DELETE by any user
+            //! Check if the task has already been approved for DELETE by any user
             boolean hasApprovedDeleteAction = taskReplacementRepository.existsByTaskAndActionAndStatus(
                     task,
                     TaskAction.DELETE,
@@ -84,33 +84,33 @@ public class TaskReplacementServiceImpl implements TaskReplacementService {
             );
 
             if (hasApprovedDeleteAction) {
-                // If the task has already been approved for DELETE, return an error response
+                //! If the task has already been approved for DELETE, return an error response
                 return new TaskReplacementResponseDTO("error", "Task has already been approved for deletion by another user");
             }
 
-            // Store the assigned user before setting assignedTo to NULL
+            //! Store the assigned user before setting assignedTo to NULL
             User assignedToUser = task.getAssignedTo();
 
-            // Set the assignedTo to NULL
+            //! Set the assignedTo to NULL
             task.setAssignedTo(null);
             taskRepository.save(task);
 
-            // Decrement user's token count by 1
+            //! Decrement user's token count by 1
             user.setToken(user.getToken() - 1);
             userRepository.save(user);
 
-            // Create TaskReplacement with DELETE action
+            //! Create TaskReplacement with DELETE action
             TaskReplacement taskReplacement = new TaskReplacement();
             taskReplacement.setTask(task);
             taskReplacement.setDateTime(LocalDateTime.now());
-            taskReplacement.setOldUser(assignedToUser); // Set OldUser as the user to whom the task was assigned before the change
-            taskReplacement.setNewUser(null); // Set to NULL for DELETE action
+            taskReplacement.setOldUser(assignedToUser); //!Set OldUser as the user to whom the task was assigned before the change
+            taskReplacement.setNewUser(null); //!Set to NULL for DELETE action
             taskReplacement.setAction(TaskAction.DELETE);
             taskReplacement.setStatus(TaskReplacementStatus.APPROVED);
 
             taskReplacement = taskReplacementRepository.save(taskReplacement);
 
-            // Returning success message along with created task replacement details
+            //! Returning success message along with created task replacement details
             TaskReplacementResponseDTO responseDTO = modelMapper.map(taskReplacement, TaskReplacementResponseDTO.class);
             responseDTO.setStatus("success");
             responseDTO.setMessage("TaskReplacement created successfully");
@@ -133,7 +133,7 @@ public class TaskReplacementServiceImpl implements TaskReplacementService {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
 
-            // Check if the user has enough tokens
+            //!Check if the user has enough tokens
             if (user.getToken() <= 0) {
                 throw new IllegalArgumentException("User does not have enough tokens");
             }
@@ -141,41 +141,41 @@ public class TaskReplacementServiceImpl implements TaskReplacementService {
             Task task = taskRepository.findById(taskId)
                     .orElseThrow(() -> new EntityNotFoundException("Task not found with id: " + taskId));
 
-            // Check if the provided userId matches the assignedToId of the task
+            //!Check if the provided userId matches the assignedToId of the task
             Long assignedToId = task.getAssignedTo() != null ? task.getAssignedTo().getId() : null;
             if (!Objects.equals(userId, assignedToId)) {
                 throw new IllegalArgumentException("Invalid userId provided for Task with id: " + taskId);
             }
 
-            // Check if there is an approved TaskReplacement for this task
+            //!Check if there is an approved TaskReplacement for this task
             boolean hasApprovedTaskReplacement = taskReplacementRepository.existsByTaskAndStatus(task, TaskReplacementStatus.APPROVED);
 
             if (hasApprovedTaskReplacement) {
-                // If there is an approved TaskReplacement, show an error
+                //!If there is an approved TaskReplacement, show an error
                 return new TaskReplacementResponseDTO("error", "This task has already been edited or deleted once");
             }
 
-            // Check if it's less than 24 hours before the task's start date
+            //!Check if it's less than 24 hours before the task's start date
             LocalDate startDate = task.getStartDate();
             LocalDate currentDate = LocalDate.now();
             if (startDate != null && currentDate.plusDays(1).isAfter(startDate)) {
                 throw new IllegalArgumentException("Cannot create TaskReplacement less than 24 hours before the task's start date");
             }
 
-            // Create TaskReplacement with EDIT action
+            //!Create TaskReplacement with EDIT action
             TaskReplacement taskReplacement = new TaskReplacement();
             taskReplacement.setTask(task);
             taskReplacement.setDateTime(LocalDateTime.now());
 
-            // Set OldUser as the user to whom the task is currently assigned
+            //!Set OldUser as the user to whom the task is currently assigned
             taskReplacement.setOldUser(task.getAssignedTo());
-            taskReplacement.setNewUser(null); // Set to NULL for EDIT action
+            taskReplacement.setNewUser(null); //!Set to NULL for EDIT action
             taskReplacement.setAction(TaskAction.EDIT);
             taskReplacement.setStatus(TaskReplacementStatus.OPEN);
 
             taskReplacement = taskReplacementRepository.save(taskReplacement);
 
-            // Returning success message along with created task replacement details
+            //!Returning success message along with created task replacement details
             TaskReplacementResponseDTO responseDTO = modelMapper.map(taskReplacement, TaskReplacementResponseDTO.class);
             responseDTO.setStatus("success");
             responseDTO.setMessage("TaskReplacement created successfully");
@@ -202,20 +202,20 @@ public class TaskReplacementServiceImpl implements TaskReplacementService {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
 
-            // Check if the user has admin role
+            //!Check if the user has admin role
             if (!user.getRole().equals(Role.ADMIN)) {
                 throw new RuntimeException("Unauthorized access: User does not have admin role");
             }
 
-            // Check if the TaskReplacement has action EDIT and status OPEN
+            //!Check if the TaskReplacement has action EDIT and status OPEN
             if (taskReplacement.getAction() != TaskAction.EDIT || taskReplacement.getStatus() != TaskReplacementStatus.OPEN) {
                 throw new IllegalArgumentException("Invalid TaskReplacement state for approval");
             }
 
-            // Update the TaskReplacementStatus to APPROVED
+            //!Update the TaskReplacementStatus to APPROVED
             taskReplacement.setStatus(TaskReplacementStatus.APPROVED);
 
-            // If there is a new user specified, update the task's assigned user
+            //!If there is a new user specified, update the task's assigned user
             if (newUserId != null) {
                 User newUser = userRepository.findById(newUserId)
                         .orElseThrow(() -> new EntityNotFoundException("New user not found with id: " + newUserId));
@@ -223,17 +223,17 @@ public class TaskReplacementServiceImpl implements TaskReplacementService {
                 taskReplacement.getTask().setAssignedTo(newUser);
             }
 
-            // Save the TaskReplacement
+            //!Save the TaskReplacement
             taskReplacement = taskReplacementRepository.save(taskReplacement);
 
-            // Reduce the token of the old user by 1
+            //!Reduce the token of the old user by 1
             User oldUser = taskReplacement.getOldUser();
             if (oldUser != null && oldUser.getToken() > 0) {
                 oldUser.setToken(oldUser.getToken() - 1);
                 userRepository.save(oldUser);
             }
 
-            // Returning success message along with updated task replacement details
+            //!Returning success message along with updated task replacement details
             TaskReplacementResponseDTO responseDTO = modelMapper.map(taskReplacement, TaskReplacementResponseDTO.class);
             responseDTO.setStatus("success");
             responseDTO.setMessage("TaskReplacement approved successfully");
@@ -259,16 +259,16 @@ public class TaskReplacementServiceImpl implements TaskReplacementService {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
 
-            // Check if the user has admin role
+            //!Check if the user has admin role
             if (!user.getRole().equals(Role.ADMIN)) {
                 throw new RuntimeException("Unauthorized access: User does not have admin role");
             }
 
-            // Update the TaskReplacementStatus to REJECTED
+            //!Update the TaskReplacementStatus to REJECTED
             taskReplacement.setStatus(TaskReplacementStatus.REJECTED);
             taskReplacement = taskReplacementRepository.save(taskReplacement);
 
-            // Returning success message along with updated task replacement details
+            //!Returning success message along with updated task replacement details
             TaskReplacementResponseDTO responseDTO = modelMapper.map(taskReplacement, TaskReplacementResponseDTO.class);
             responseDTO.setStatus("success");
             responseDTO.setMessage("TaskReplacement rejected successfully");

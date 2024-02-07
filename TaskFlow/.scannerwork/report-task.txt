@@ -1,6 +1,6 @@
-projectKey=project:TaskFlow
+projectKey=TaskFlow
 serverUrl=http://localhost:9000
 serverVersion=10.3.0.82913
-dashboardUrl=http://localhost:9000/dashboard?id=project%3ATaskFlow
-ceTaskId=AYzObWbsvdesjCHFuKza
-ceTaskUrl=http://localhost:9000/api/ce/task?id=AYzObWbsvdesjCHFuKza
+dashboardUrl=http://localhost:9000/dashboard?id=TaskFlow
+ceTaskId=AY0cygncqVvo0kTGyrBz
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AY0cygncqVvo0kTGyrBz
